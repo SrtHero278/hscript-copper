@@ -960,6 +960,7 @@ class Checker {
 			default: TDynamic;
 			}
 		switch( edef(expr) ) {
+		case EImport(_, _) | EUsing(_): return makeMono();
 		case EConst(c):
 			return switch (c) {
 			case CInt(_): TInt;
@@ -1215,6 +1216,7 @@ class Checker {
 			typeExpr(e, NoValue);
 			this.locals = locals;
 			return TVoid;
+		case EInterpStr(_): return types.t_string;
 		case EBinop(op, e1, e2):
 			switch( op ) {
 			case "&", "|", "^", ">>", ">>>", "<<":

@@ -143,6 +143,10 @@ class Bytes {
 		case EField(e,f):
 			doEncode(e);
 			doEncodeString(f);
+		case EInterpStr(vals):
+			doEncodeInt(vals.length);
+			for ( v in vals )
+				doEncode(v);
 		case EBinop(op,e1,e2):
 			doEncodeString(op);
 			doEncode(e1);
@@ -230,6 +234,11 @@ class Bytes {
 			bout.addByte(args == null ? 0 : args.length + 1);
 			if( args != null ) for( e in args ) doEncode(e);
 			doEncode(e);
+		case EImport(name, rename):
+			doEncodeString(name);
+			doEncodeString(rename == null ? "" : rename);
+		case EUsing(name):
+			doEncodeString(name);
 		case ECheckType(e,_):
 			doEncode(e);
 		}
@@ -266,64 +275,66 @@ class Bytes {
 			var e = doDecode();
 			EField(e,doDecodeString());
 		case 6:
+			EInterpStr([for (i in 0...doDecodeInt()) doDecode()]);
+		case 7:
 			var op = doDecodeString();
 			var e1 = doDecode();
 			EBinop(op,e1,doDecode());
-		case 7:
+		case 8:
 			var op = doDecodeString();
 			var prefix = bin.get(pin++) != 0;
 			EUnop(op,prefix,doDecode());
-		case 8:
+		case 9:
 			var e = doDecode();
 			var params = new Array();
 			for( i in 0...bin.get(pin++) )
 				params.push(doDecode());
 			ECall(e,params);
-		case 9:
+		case 10:
 			var cond = doDecode();
 			var e1 = doDecode();
 			EIf(cond,e1,doDecode());
-		case 10:
+		case 11:
 			var cond = doDecode();
 			EWhile(cond,doDecode());
-		case 11:
+		case 12:
 			var v = doDecodeString();
 			var it = doDecode();
 			EFor(v,it,doDecode());
-		case 12:
-			EBreak;
 		case 13:
-			EContinue;
+			EBreak;
 		case 14:
+			EContinue;
+		case 15:
 			var params = new Array<Argument>();
 			for( i in 0...bin.get(pin++) )
 				params.push({ name : doDecodeString() });
 			var e = doDecode();
 			var name = doDecodeString();
 			EFunction(params,e,(name == "") ? null: name);
-		case 15:
-			EReturn(doDecode());
 		case 16:
+			EReturn(doDecode());
+		case 17:
 			var e = doDecode();
 			EArray(e,doDecode());
-		case 17:
+		case 18:
 			var el = new Array();
 			for( i in 0...bin.get(pin++) )
 				el.push(doDecode());
 			EArrayDecl(el);
-		case 18:
+		case 19:
 			var cl = doDecodeString();
 			var el = new Array();
 			for( i in 0...bin.get(pin++) )
 				el.push(doDecode());
 			ENew(cl,el);
-		case 19:
-			EThrow(doDecode());
 		case 20:
+			EThrow(doDecode());
+		case 21:
 			var e = doDecode();
 			var v = doDecodeString();
 			ETry(e,v,null,doDecode());
-		case 21:
+		case 22:
 			var fl = new Array();
 			for( i in 0...bin.get(pin++) ) {
 				var name = doDecodeString();
@@ -331,12 +342,12 @@ class Bytes {
 				fl.push({ name : name, e : e });
 			}
 			EObject(fl);
-		case 22:
+		case 23:
 			var cond = doDecode();
 			var e1 = doDecode();
 			var e2 = doDecode();
 			ETernary(cond, e1, e2);
-		case 23:
+		case 24:
 			var e = doDecode();
 			var cases = [];
 			while( true ) {
@@ -352,15 +363,21 @@ class Bytes {
 			}
 			var def = doDecode();
 			ESwitch(e, cases, def);
-		case 24:
+		case 25:
 			var cond = doDecode();
 			EDoWhile(cond,doDecode());
-		case 25:
+		case 26:
 			var name = doDecodeString();
 			var count = bin.get(pin++);
 			var args = count == 0 ? null : [for( i in 0...count - 1 ) doDecode()];
 			EMeta(name, args, doDecode());
-		case 26:
+		case 27:
+			final cls = doDecodeString();
+			final rename = doDecodeString();
+			EImport(cls, (rename == "" ? null : rename));
+		case 28:
+			EUsing(doDecodeString());
+		case 29:
 			ECheckType(doDecode(), CTPath(["Void"]));
 		case 255:
 			null;

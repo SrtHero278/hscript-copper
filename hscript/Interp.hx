@@ -332,6 +332,11 @@ class Interp {
 			return v;
 		case EField(e,f):
 			return get(expr(e),f);
+		case EInterpStr(vals):
+			var str = Std.string(expr(vals[0]));
+			for (i in 1...vals.length)
+				str += Std.string(expr(vals[i]));
+			return str;
 		case EBinop(op,e1,e2):
 			var fop = binops.get(op);
 			if( fop == null ) error(EInvalidOp(op));

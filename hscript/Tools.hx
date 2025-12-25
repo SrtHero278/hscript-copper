@@ -31,6 +31,7 @@ class Tools {
 		case EParent(e): f(e);
 		case EBlock(el): for( e in el ) f(e);
 		case EField(e, _): f(e);
+		case EInterpStr(vals): for ( v in vals ) f(v);
 		case EBinop(_, e1, e2): f(e1); f(e2);
 		case EUnop(_, _, e): f(e);
 		case ECall(e, args): f(e); for( a in args ) f(a);
@@ -67,6 +68,7 @@ class Tools {
 		case EParent(e): EParent(f(e));
 		case EBlock(el): EBlock([for( e in el ) f(e)]);
 		case EField(e, fi): EField(f(e),fi);
+		case EInterpStr(vals): EInterpStr([for ( v in vals ) f(v)]);
 		case EBinop(op, e1, e2): EBinop(op, f(e1), f(e2));
 		case EUnop(op, pre, e): EUnop(op, pre, f(e));
 		case ECall(e, args): ECall(f(e),[for( a in args ) f(a)]);

@@ -46,6 +46,7 @@ enum Expr {
 	EParent( e : Expr );
 	EBlock( e : Array<Expr> );
 	EField( e : Expr, f : String );
+	EInterpStr( vals : Array<Expr> );
 	EBinop( op : String, e1 : Expr, e2 : Expr );
 	EUnop( op : String, prefix : Bool, e : Expr );
 	ECall( e : Expr, params : Array<Expr> );

@@ -153,6 +153,7 @@ class Printer {
 		case EField(e, f):
 			expr(e);
 			add("." + f);
+		case EInterpStr(vals):
 		case EBinop(op, e1, e2):
 			expr(e1);
 			add(" " + op + " ");

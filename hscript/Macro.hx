@@ -137,7 +137,11 @@ class Macro {
 	}
 
 	public function convert( e : hscript.Expr ) : Expr {
-		return { expr : switch( #if hscriptPos e.e #else e #end ) {
+		final hExpr = #if hscriptPos e.e #else e #end;
+		return { expr : switch( hExpr ) {
+			case EImport(_, _) | EUsing(_):
+				throw "Hscript expression " + hExpr + " not allowed in Macro.convert";
+				null;
 			case EConst(c):
 				EConst(switch(c) {
 					case CInt(v): CInt(Std.string(v));
@@ -154,6 +158,11 @@ class Macro {
 				EBlock(map(el,convert));
 			case EField(e, f):
 				EField(convert(e), f);
+			case EInterpStr(vals):
+				var curExpr = convert(vals[0]);
+				for (i in 1...vals.length)
+					curExpr.expr = EBinop(OpAdd, curExpr, convert(vals[i]));
+				curExpr.expr;
 			case EBinop(op, e1, e2):
 				var b = binops.get(op);
 				if( b == null ) throw EInvalidOp(op);

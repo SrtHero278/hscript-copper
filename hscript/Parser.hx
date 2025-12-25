@@ -503,12 +503,12 @@ class Parser {
 					default: unexpected(t[tokIdx]);
 				}
 			}
-			var curExpr:Expr = interpToken();
+			var exprs:Array<Expr> = [interpToken()];
 
 			while ( tokIdx >= 0 )
-				curExpr = mk(EBinop("+", interpToken(), curExpr));
+				exprs.insert(0, interpToken());
 
-			return curExpr;
+			return parseExprNext(mk(EInterpStr(exprs)));
 		default:
 			return unexpected(tk);
 		}
