@@ -20,8 +20,11 @@
  * DEALINGS IN THE SOFTWARE.
  */
 package hscript;
-import haxe.PosInfos;
+
 import hscript.Expr;
+import hscript.ScriptIterator;
+
+import haxe.PosInfos;
 import haxe.Constraints;
 
 private enum Stop {
@@ -38,6 +41,7 @@ private enum Stop {
 	public var old:HScriptLocal;
 }
 
+@:allow(hscript.ScriptIterator)
 class Interp {
 
     @:unreflective
@@ -143,7 +147,7 @@ class Interp {
 		binops.set("||",function(e1,e2) return me.expr(e1) == true || me.expr(e2) == true);
 		binops.set("&&",function(e1,e2) return me.expr(e1) == true && me.expr(e2) == true);
 		binops.set("=",assign);
-		binops.set("...",function(e1,e2) return new IntIterator(me.expr(e1),me.expr(e2)));
+		binops.set("...",function(e1,e2) return new ScriptIterator(me, me.expr(e1),me.expr(e2)));
 		binops.set("is",function(e1,e2) return #if (haxe_ver >= 4.2) Std.isOfType #else Std.is #end (me.expr(e1), me.expr(e2)));
 		binops.set("??",function(e1,e2) {
 			var v1 : Dynamic = me.expr(e1);
@@ -160,6 +164,7 @@ class Interp {
 		assignOp("<<=",function(v1,v2) return v1 << v2);
 		assignOp(">>=",function(v1,v2) return v1 >> v2);
 		assignOp(">>>=",function(v1,v2) return v1 >>> v2);
+		assignOp("??=",function(v1,v2) return v1 ?? v2);
 	}
 
 	function setVar( name : String, v : Dynamic ) {
