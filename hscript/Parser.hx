@@ -1767,8 +1767,13 @@ class Parser {
 				char = readChar();
 				if( char == ".".code )
 					return TQuestionDot;
-				if( char == "?".code )
+				if( char == "?".code ) {
+					char = readChar();
+					if ( char == "=".code )
+						return TOp("??=");
+					this.char = char;
 					return TOp("??");
+				}
 				this.char = char;
 				return TQuestion;
 			case ":".code: return TDoubleDot;

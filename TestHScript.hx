@@ -168,16 +168,20 @@ class TestHScript extends TestCase {
 		assertScript("ptnull?.x ?? 12", 12, vars);
 		assertScript("pt?.x ?? 12", 10, vars);
 		assertScript("pt.y ?? 12", 12, vars);
+
+		assertScript("ptnull ??= 12; ptnull;", 12, vars);
+		assertScript("pt2null.x ??= 10; pt2null.x;", 10, vars);
+		assertScript("pt2null.pt ??= pt; pt2null.pt.call();", 11, vars);
 	}
 
 	function testIsOperator():Void {
-		var vars = {
+		var vars = {/*
 			String: String,
 			Bool: Bool,
 			Int: Int,
 			Float: Float,
 			Dynamic: Dynamic
-		}
+		*/}
 		assertScript("10 is Int", true, vars);
 		assertScript("10.0 is Int", true, vars);
 		assertScript("10.1 is Int", false, vars);

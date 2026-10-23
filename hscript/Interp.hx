@@ -108,12 +108,23 @@ class Interp {
 		variables.set("null",null);
 		variables.set("true",true);
 		variables.set("false",false);
+
 		variables.set("trace", Reflect.makeVarArgs(function(el) {
 			var inf = posInfos();
 			var v = el.shift();
 			if( el.length > 0 ) inf.customParams = el;
 			haxe.Log.trace(Std.string(v), inf);
 		}));
+
+		variables.set("String", String);
+		variables.set("Int", Int);
+		variables.set("Float", Float);
+		variables.set("Bool", Bool);
+		variables.set("Dynamic", Dynamic);
+		variables.set("Any", Dynamic); // while this seems bad, hscript already turns many things into Dynamic.
+
+		variables.set("Std", Std);
+		variables.set("Math", Math);
 	}
 
 	public function posInfos(): PosInfos {
