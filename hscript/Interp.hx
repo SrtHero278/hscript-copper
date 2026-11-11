@@ -299,13 +299,16 @@ class Interp {
 	}
 
 	public function execute( expr : Expr ) : Dynamic {
+		var oldDepth:Int = depth;
 		depth = switch (#if hscriptPos expr.e #else expr #end) {
 			case EBlock(e): -1;
 			default: 0;
 		}
 		locals = new Map();
 		declared = new Array();
-		return exprReturn(expr);
+		var result:Dynamic = exprReturn(expr);
+		depth = oldDepth;
+		return result;
 	}
 
 	function exprReturn(e) : Dynamic {
@@ -404,6 +407,7 @@ class Interp {
 			for( e in exprs )
 				v = expr(e);
 			restore(old);
+			--depth;
 			return v;
 		case EField(e,f):
 			return get(expr(e),f);
